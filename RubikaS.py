@@ -1,6 +1,21 @@
+# RubikaS Beta
+
 import base64
 from Crypto.Cipher import AES
 import time
+from selenium import webdriver
+from selenium.webdriver.common.keys import Keys
+from selenium.webdriver.common.by import By
+from webdriver_manager.chrome import ChromeDriverManager
+from selenium.webdriver.chrome.options import Options
+
+chrome_options = Options() 
+chrome_options.add_experimental_option("detach", True)
+
+
+driver = webdriver.Chrome(ChromeDriverManager().install(), options=chrome_options)
+
+driver.maximize_window()
 
 class RubikaS:
     def __init__(self, phonenumber):
@@ -8,11 +23,16 @@ class RubikaS:
         self.k = b"1234567890123456"
 
     def enter_phonenumber(self, phonenumber):
-        # returns true if phone number is entered and waits for password
+        driver.get("https://web.rubika.ir/#/login")
+        time.sleep(2)
+        driver.find_element(By.NAME, "phone_number").send_keys("9034679802")
+        time.sleep(2)
+        btn = driver.find_element(By.XPATH, "//app-root/tab-login/div/div/div/div/div/div/button/div/div")
+        btn.click()
         return True
 
     def enter_password(self, password):
-        # returns true if logged in successfully
+        driver.find_element(By.NAME, "phone_code").send_keys(password)
         return True
 
     def login(self, phonenumber):
@@ -70,9 +90,6 @@ def main():
             time.sleep(0.5)
             if rubikaS.check_message():
                 print(rubikaS.recieve_message())
-    
-            wants_to_send_message = str(input("Do you want to send a message? y/n "))
-            if (wants_to_send_message == 'y'):
                 message = str(input("Enter the message: "))
                 is_successful = rubikaS.send_message(message)
                 if not is_successful:
